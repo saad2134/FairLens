@@ -1,9 +1,6 @@
-# FairLens 🔍⚖️
+# FairLens ⚖️
 
 <p align="center">
-  <a href="https://github.com/fairlens/fairlens/actions/workflows/ci.yml/badge.svg">
-    <img src="https://github.com/fairlens/fairlens/actions/workflows/ci.yml/badge.svg" alt="CI" />
-  </a>
   <a href="https://pypi.org/project/fairlens/">
     <img src="https://img.shields.io/pypi/v/fairlens" alt="PyPI" />
   </a>
@@ -29,7 +26,7 @@
 FairLens is a full-stack SaaS platform that enables teams to upload datasets and trained models, then receive comprehensive, interactive fairness audit reports. Built for production use with model-format agnosticism, audit versioning, and enterprise compliance features.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/fairlens/.github/main/docs/heatmap-preview.png" alt="FairLens Bias Heatmap" width="800" />
+  <img width="748" height="294" alt="image" src="https://github.com/user-attachments/assets/f17cf875-6202-43bf-b516-0c3aa1bdb085" />
 </p>
 
 ## ✨ Key Features
@@ -77,16 +74,16 @@ Access the UI at `http://localhost:5173`
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Frontend                                │
-│   React 18 + TypeScript + Vite + TailwindCSS + Recharts + D3  │
+│   React 18 + TypeScript + Nextjs + TailwindCSS + Recharts + D3  │
 └────────────────────────────┬────────────────────────────────────┘
                              │ REST API + WebSocket
 ┌────────────────────────────▼────────────────────────────────────┐
 │                         Backend                                 │
-│      FastAPI + SQLAlchemy + Celery + Redis                     │
+│      FastAPI + SQLAlchemy + Celery + Redis                      │
 ├─────────────────────────────────────────────────────────────────┤
-│  Fairness Engine: fairlearn | AIF360 | SHAP | ONNX Runtime     │
+│  Fairness Engine: fairlearn | AIF360 | SHAP | ONNX Runtime      │
 ├─────────────────────────────────────────────────────────────────┤
-│              Storage: PostgreSQL + S3/MinIO                    │
+│              Storage: PostgreSQL + S3/MinIO                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -102,7 +99,7 @@ Access the UI at `http://localhost:5173`
 ## 🔧 Tech Stack
 
 ### Frontend
-- React 18 + TypeScript + Vite
+- React 18 + TypeScript + Nextjs
 - TailwindCSS
 - Recharts (metrics visualization)
 - D3.js (bias heatmap)
@@ -139,10 +136,6 @@ npm run format      # Frontend
 black .             # Backend
 ```
 
-## 📄 License
-
-Licensed under the [MIT License](LICENSE).
-
 ## 🔗 Links
 
 - **[Live Demo](https://fairlens.ai/demo)** - Try it out
@@ -151,8 +144,96 @@ Licensed under the [MIT License](LICENSE).
 - **[Blog](https://fairlens.ai/blog)** - Updates & guides
 - **[Twitter](https://twitter.com/fairlensai)** - Follow us
 
+
+
+## 👥 Our Google Solution Challenge 2026 Hackathon Team (DevBandits)
+
+<div align="center">
+
+<table>
+  <tr>
+    <td colspan="4" align="center">
+      <img width="384" height="168" alt="DevBandits Banner" src="https://github.com/user-attachments/assets/626dba91-4d4a-4c6a-9e87-9e9730fea018" />
+    </td>
+  </tr>
+
+  <tr>
+    <th>#</th>
+    <th>Team Member</th>
+    <th>Role</th>
+    <th>GitHub Profile</th>
+  </tr>
+
+  <tr>
+    <td align="center">1</td>
+    <td><b>Abdur Rahman Qasim</b></td>
+    <td>🎯 Team Lead</td>
+    <td><a href="https://github.com/Abdur-rahman-01">🔗 FareedAhmedOwais</a></td>
+  </tr>
+
+  <tr>
+    <td align="center">2</td>
+    <td><b>Fareed Ahmed Owais</b></td>
+    <td>🖼️ Frontend Developer</td>
+    <td><a href="https://github.com/FareedAhmedOwais">🔗 Abdur-rahman-01</a></td>
+  </tr>
+
+  <tr>
+    <td align="center">3</td>
+    <td><b>Mohammed Saad Uddin</b></td>
+    <td>🚀 Full-stack + AI/ML Developer</td>
+    <td><a href="https://github.com/saad2134">🔗 saad2134</a></td>
+  </tr>
+
+  <tr>
+    <td align="center">4</td>
+    <td><b>Mohammed Abdul Rahman</b></td>
+    <td>🎨 UI/UX Designer</td>
+    <td><a href="https://github.com/Abdul-Rahman26">🔗 saad2134</a></td>
+  </tr>
+</table>
+
+
+
+</div>
+
+
+## 📊 **Repo Stats**
+
+<div align="center">
+  
+![Repo Size](https://img.shields.io/github/repo-size/saad2134/FairLens)
+![Last Commit](https://img.shields.io/github/last-commit/saad2134/FairLens)
+![Open Issues](https://img.shields.io/github/issues/saad2134/FairLens)
+![Open PRs](https://img.shields.io/github/issues-pr/saad2134/FairLens)
+![License](https://img.shields.io/github/license/saad2134/FairLens)
+![Forks](https://img.shields.io/github/forks/saad2134/FairLens?style=social)
+![Stars](https://img.shields.io/github/stars/saad2134/FairLens?style=social)
+![Watchers](https://img.shields.io/github/watchers/saad2134/FairLens?style=social)
+![Contributors](https://img.shields.io/github/contributors/saad2134/FairLens)
+![Languages](https://img.shields.io/github/languages/count/saad2134/FairLens)
+![Top Language](https://img.shields.io/github/languages/top/saad2134/FairLens)
+
+</div>
+
+
+## ⭐ Star History
+
+<a href="https://www.star-history.com/#saad2134/FairLens&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=saad2134/FairLens&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=saad2134/FairLens&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=saad2134/FairLens&type=Date" />
+ </picture>
+</a>
+
 ---
 
-<p align="center">
-  Made with ❤️ by the FairLens team
-</p>
+## ✍️ Endnote
+<p align="center">Developed with 💖 for the Google Solution Challenge 2026 Hackathon (powered by Hack2Skill), with heartfelt thanks for the opportunity to build and innovate.</p>
+
+---
+
+## 🏷 Tags  
+
+`#WebApp` 
