@@ -49,3 +49,4 @@ Thumbs.db
 .coverage
 htmlcov/
 /PLAN
+/frontend/.next

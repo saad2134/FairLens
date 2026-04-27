@@ -1,15 +1,20 @@
 "use client";
 
 import * as React from "react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Github, Twitter, Linkedin } from "lucide-react";
+import Image from "next/image";
+import { Github } from "lucide-react";
 import { siteConfig, SOCIAL_LINKS } from "@/config/site";
 
 function Footer({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="footer"
-      className={`mx-auto w-full bg-white border-t border-gray-200 ${className}`}
+      className={cn(
+        "mx-auto mb-8 w-full max-w-7xl rounded-2xl p-6 shadow-xl backdrop-blur-md border border-border/20 dark:border-border/50",
+        className,
+      )}
       {...props}
     />
   );
@@ -18,7 +23,11 @@ function Footer({ className, ...props }: React.ComponentProps<"div">) {
 function FooterContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={`grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 pb-8 ${className}`}
+      data-slot="footer-content"
+      className={cn(
+        "grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 pb-2",
+        className,
+      )}
       {...props}
     />
   );
@@ -26,7 +35,24 @@ function FooterContent({ className, ...props }: React.ComponentProps<"div">) {
 
 function FooterColumn({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={`flex flex-col gap-4 ${className}`} {...props} />
+    <div
+      data-slot="footer-column"
+      className={cn("flex flex-col gap-4", className)}
+      {...props}
+    />
+  );
+}
+
+function FooterBottom({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="footer-bottom"
+      className={cn(
+        "mt-8 flex flex-col items-center justify-between gap-4 border-t border-border pt-4 pb-2 text-xs text-muted-foreground sm:flex-row",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
@@ -43,33 +69,25 @@ interface FooterColumnProps {
 export default function FooterSection({
   columns = [
     {
-      appName: "Product",
+      appName: "Application",
       links: [
-        { text: "Features", href: "/#features" },
-        { text: "How It Works", href: "/#how-it-works" },
-        { text: "Pricing", href: "/pricing" },
+        { text: "Home", href: "/" },
+        { text: "Login", href: "/login" },
+        { text: "Signup", href: "/signup" },
       ],
     },
     {
       appName: "Resources",
       links: [
-        { text: "Documentation", href: "/docs" },
-        { text: "API Reference", href: "/api-docs" },
+        { text: "Help Center", href: "/help-center" },
         { text: "Blog", href: "/blog" },
-      ],
-    },
-    {
-      appName: "Company",
-      links: [
-        { text: "About", href: "/about" },
         { text: "Careers", href: "/careers" },
-        { text: "Contact", href: "/contact" },
       ],
     },
     {
       appName: "Legal",
       links: [
-        { text: "Privacy Policy", href: "/privacy" },
+        { text: "Privacy Policy", href: "/policy" },
         { text: "Terms of Service", href: "/terms" },
         { text: "Cookie Policy", href: "/cookies" },
       ],
@@ -81,43 +99,36 @@ export default function FooterSection({
   copyright?: string;
 }) {
   return (
-    <footer className="w-full py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Footer>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12">
-            {/* Brand Column */}
-            <FooterColumn className="md:col-span-2">
+    <footer className="relative w-full px-8 pt-14 pb-8">
+      <div className="max-w-7xl mx-auto ">
+        <Footer className="bg-muted/10">
+          <FooterContent className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+            <FooterColumn className="lg:col-span-2">
               <div className="flex flex-col gap-4">
-                <Link href="/" className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                  <span className="font-serif text-xl font-bold text-gray-900">{siteConfig.name}</span>
+                <Link href="/" className="flex items-center gap-2">
+                  <Image src="/favicon.svg" alt="Logo" width={24} height={24} className="text-primary" />
+                  <span className="font-bold text-lg text-foreground">{siteConfig.name}</span>
                 </Link>
-                <p className="text-gray-500 text-sm max-w-md">
+                <p className="text-muted-foreground text-sm max-w-md">
                   {siteConfig.description}
                 </p>
-                <div className="flex items-center gap-4">
-                  {SOCIAL_LINKS.github && (
-                    <Link
-                      href={SOCIAL_LINKS.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <Github className="w-5 h-5" />
-                    </Link>
-                  )}
-                </div>
+                {SOCIAL_LINKS.github && (
+                  <Link
+                    href={SOCIAL_LINKS.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground transition-colors"
+                  >
+                    <Github className="w-4 h-4" />
+                    {/* <span>GitHub</span> */}
+                  </Link>
+                )}
               </div>
             </FooterColumn>
 
-            {/* Link Columns */}
             {columns.map((column, index) => (
-              <FooterColumn key={index}>
-                <h3 className="text-sm font-semibold text-gray-900 mb-4">
+              <FooterColumn key={index} className="flex flex-col gap-4">
+                <h3 className="text-sm font-semibold text-foreground">
                   {column.appName}
                 </h3>
                 <div className="flex flex-col gap-2">
@@ -125,7 +136,7 @@ export default function FooterSection({
                     <Link
                       key={linkIndex}
                       href={link.href}
-                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                      className="text-muted-foreground text-sm hover:text-foreground transition-colors"
                     >
                       {link.text}
                     </Link>
@@ -133,12 +144,12 @@ export default function FooterSection({
                 </div>
               </FooterColumn>
             ))}
-          </div>
+          </FooterContent>
         </Footer>
 
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">{copyright}</p>
+        <div className="flex flex-col items-center justify-center w-full mt-8 gap-3">
+          <div className="text-sm text-muted-foreground">
+            {copyright}
           </div>
         </div>
       </div>
@@ -146,4 +157,4 @@ export default function FooterSection({
   );
 }
 
-export { Footer, FooterColumn, FooterContent };
+export { Footer, FooterColumn, FooterContent, FooterBottom };

@@ -1,0 +1,16 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg" fill="none">
+
+ <g>
+  <title>Layer 1</title>
+  <rect x="0" y="0" stroke="null" id="svg_1" fill="#052e16" rx="128" height="512" width="512"/>
+  <circle id="svg_2" stroke-opacity="0.2" stroke-width="12" stroke="#22c55e" r="140" cy="246" cx="254"/>
+  <circle id="svg_3" stroke-width="24" stroke="#4ade80" r="110" cy="246" cx="254"/>
+  <path id="svg_4" stroke-linecap="round" stroke-width="16" stroke="#f0fdf4" d="m188,246l132,0"/>
+  <path id="svg_5" stroke-linecap="round" stroke-width="12" stroke="#4ade80" d="m188,246l0,40m-30,0l60,0"/>
+  <path id="svg_6" stroke-linecap="round" stroke-width="12" stroke="#4ade80" d="m320,246l0,40m-30,0l60,0"/>
+  <path id="svg_7" stroke-linecap="round" stroke-width="32" stroke="#4ade80" d="m328,320l80,80"/>
+  <circle id="svg_8" fill="#22c55e" r="12" cy="196" cx="254"/>
+  <circle id="svg_9" fill="#f0fdf4" r="8" cy="216" cx="228"/>
+  <circle id="svg_10" fill="#f0fdf4" r="8" cy="216" cx="280"/>
+ </g>
+</svg>

@@ -19,3 +19,4 @@ alembic==1.13.1
 redis==5.0.1
 celery==5.3.6
 aiofiles==23.2.1
+ruff==0.1.9

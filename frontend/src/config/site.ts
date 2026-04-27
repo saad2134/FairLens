@@ -9,7 +9,7 @@ export const siteConfig = {
     "A full-stack SaaS platform for comprehensive, interactive fairness audit reports. Upload datasets and models to detect bias and ensure fair AI.",
   links: {
     twitter: "",
-    github: "https://github.com/fairlens/fairlens",
+    github: "https://github.com/saad2134/FairLens",
     email: "",
     phone: "",
   },
@@ -20,6 +20,10 @@ export type SiteConfig = typeof siteConfig;
 export const CORE_CONFIG = {
   appName: siteConfig.name,
   appDescription: siteConfig.description,
+};
+
+export const API_CONFIG = {
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
 };
 
 export const SOCIAL_LINKS = siteConfig.links;
