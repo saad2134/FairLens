@@ -277,4 +277,4 @@ black .             # Backend
 
 ## 🏷 Tags  
 
-`#WebApp` 
+#WebApp #AI #FairnessAuditing #MachineLearning #NextJS #FastAPI #Python #TypeScript #Demo #React #TailwindCSS #BiasDetection #FairnessMetrics #EthicalAI #ResponsibleAI #GoogleCloud #Firebase #Gemini #CloudRun #AIFairness #DataScience #MLOps #OpenSource #SaaS #Enterprise #WebDevelopment 
