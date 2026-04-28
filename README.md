@@ -40,7 +40,7 @@ FairLens is a full-stack SaaS platform that enables teams to upload datasets and
 | 📜 **Audit Versioning** | Complete audit trail with dataset/model hashes for compliance |
 | 📈 **Drift Detection** | Track fairness metrics across audit history |
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Local)
 
 ```bash
 # Clone the repository
@@ -59,6 +59,33 @@ uvicorn app.main:app --reload
 cd frontend && npm install
 npm run dev
 ```
+
+## 🚀 Quick Deploy (100% Cloud - No Local Setup)
+
+```bash
+# 1. Install Firebase CLI
+npm install -g firebase-tools
+
+# 2. Login
+firebase login
+
+# 3. Create project at https://console.firebase.google.com
+#    Enable: Authentication, Firestore, Storage, Hosting
+
+# 4. Initialize
+firebase init
+#   Select: Hosting, Functions, Firestore, Storage
+
+# 5. Build frontend
+cd frontend && npm install && npm run build && cd ..
+
+# 6. Deploy (uses free tier!)
+firebase deploy
+```
+
+**Done!** Your app is live at `https://your-project.web.app`
+
+See [DEPLOY.md](DEPLOY.md) for detailed instructions.
 
 Access the UI at `http://localhost:5173`
 
@@ -118,6 +145,36 @@ Access the UI at `http://localhost:5173`
 - Nginx
 - AWS S3 / MinIO
 - GitHub Actions
+
+## ☁️ Cloud Deploy (100% Free Tier)
+
+For Google Solution Challenge 2026, FairLens can be deployed entirely on Google Cloud:
+
+| Service | Free Tier | Purpose |
+|---------|----------|---------|
+| Firebase Hosting | 1 GB | Frontend |
+| Firestore | 20K reads/writes | Database |
+| Firebase Storage | 5 GB | File uploads |
+| Cloud Functions | 2M invocations | API Backend |
+| Gemini (Free) | 15 RPM, 1M tokens | AI Insights |
+
+**Total Cost: $0**
+
+### Cloud Architecture
+
+```
+Users → Firebase Hosting (Next.js)
+           ↓
+    Cloud Functions (Python)
+           ↓
+    Firestore + Storage
+           ↓
+    Gemini API (AI Insights)
+```
+
+### Quick Deploy
+
+See [DEPLOY.md](DEPLOY.md) for one-command deploy!
 
 ## 🤝 Contributing
 

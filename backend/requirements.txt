@@ -20,3 +20,5 @@ redis==5.0.1
 celery==5.3.6
 aiofiles==23.2.1
 ruff==0.1.9
+google-generativeai>=0.3.0
+firebase-admin>=6.4.0

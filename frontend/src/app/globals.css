@@ -148,9 +148,10 @@
     letter-spacing: var(--tracking-normal);
     @apply bg-background text-foreground;
   }
-  html {
+html {
     font-family: var(--font-sans);
     @apply font-sans;
+    scroll-behavior: smooth;
   }
 }
 

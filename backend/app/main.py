@@ -6,10 +6,17 @@ import pandas as pd
 import numpy as np
 import uuid
 import json
+import logging
 from pathlib import Path
 from datetime import datetime
 
-from app.config import settings
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+from app.config import settings, check_google_services
 from app.db import get_db, engine, Base
 from app.models import models
 from app.schemas import schemas
@@ -18,10 +25,23 @@ from app.services.fairness_engine import (
     compute_file_hash, compute_data_hash, infer_column_types
 )
 from app.services.model_loader import ModelLoader, compute_model_hash
+from app.services.gemini_service import get_gemini_service
+from app.services.firebase_service import get_firebase_service
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(message)s"
+)
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="FairLens API", version="1.0.0", description="Enterprise AI Fairness Auditing Platform")
+
+@app.on_event("startup")
+async def startup_event():
+    """Run on startup - check Google services availability."""
+    check_google_services()
 
 app.add_middleware(
     CORSMiddleware,
@@ -426,6 +446,187 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         critical_violations=red_count,
         recent_audits=[schemas.AuditRun(id=a.id, project_id=a.project_id, status=a.status,
             model_config_id=a.model_config_id, dataset_id=a.dataset_id) for a in recent_audits]
+    )
+
+@app.post("/api/audit/{audit_run_id}/insights", response_model=schemas.InsightsResponse)
+def get_ai_insights(audit_run_id: int, db: Session = Depends(get_db)):
+    """Get Gemini-powered insights for an audit. Falls back to template if no API key."""
+    audit_run = db.query(models.AuditRun).filter(models.AuditRun.id == audit_run_id).first()
+    if not audit_run:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    
+    metrics = db.query(models.MetricResult).filter(
+        models.MetricResult.audit_run_id == audit_run_id
+    ).all()
+    
+    metrics_by_attr = {}
+    for metric in metrics:
+        attr = metric.protected_attribute
+        if attr not in metrics_by_attr:
+            metrics_by_attr[attr] = {}
+        metrics_by_attr[attr][metric.metric_name] = {
+            "value": metric.value,
+            "severity": metric.severity,
+            "threshold": metric.threshold
+        }
+    
+    severity_counts = {"red": 0, "amber": 0, "green": 0}
+    for metric in metrics:
+        if metric.severity in severity_counts:
+            severity_counts[metric.severity] += 1
+    
+    total = sum(severity_counts.values())
+    fairness_score = max(0, 1 - (severity_counts["red"] * 0.3 + severity_counts["amber"] * 0.1) / max(1, total))
+    
+    results = {
+        "summary": {
+            "overall_fairness_score": fairness_score,
+            "critical_violations": severity_counts["red"],
+            "warning_count": severity_counts["amber"],
+            "passing_count": severity_counts["green"]
+        },
+        "metrics": metrics_by_attr
+    }
+    
+    gemini = get_gemini_service()
+    insights = gemini.generate_fairness_insights(results)
+    source = "gemini" if gemini.is_configured else "fallback"
+    
+    return schemas.InsightsResponse(insights=insights, source=source)
+
+@app.post("/api/chat/whatif", response_model=schemas.ChatResponse)
+def chat_whatif(request: schemas.WhatIfChatRequest):
+    """Natural language what-if simulator."""
+    gemini = get_gemini_service()
+    response = gemini.chat_whatif(
+        question=request.question,
+        dataset_schema=request.dataset_schema,
+        model_info=request.model_info
+    )
+    return schemas.ChatResponse(answer=response.get("answer", ""))
+
+@app.get("/api/audit/{audit_run_id}/report")
+def get_compliance_report(audit_run_id: int, format: str = "markdown", db: Session = Depends(get_db)):
+    """Generate compliance report with optional Gemini enhancement."""
+    audit_run = db.query(models.AuditRun).filter(models.AuditRun.id == audit_run_id).first()
+    if not audit_run:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    
+    metrics = db.query(models.MetricResult).filter(
+        models.MetricResult.audit_run_id == audit_run_id
+    ).all()
+    
+    metrics_by_attr = {}
+    for metric in metrics:
+        attr = metric.protected_attribute
+        if attr not in metrics_by_attr:
+            metrics_by_attr[attr] = {}
+        metrics_by_attr[attr][metric.metric_name] = {
+            "value": metric.value,
+            "severity": metric.severity,
+            "threshold": metric.threshold
+        }
+    
+    severity_counts = {"red": 0, "amber": 0, "green": 0}
+    for metric in metrics:
+        if metric.severity in severity_counts:
+            severity_counts[metric.severity] += 1
+    
+    total = sum(severity_counts.values())
+    fairness_score = max(0, 1 - (severity_counts["red"] * 0.3 + severity_counts["amber"] * 0.1) / max(1, total))
+    
+    results = {
+        "summary": {
+            "overall_fairness_score": fairness_score,
+            "critical_violations": severity_counts["red"],
+            "warning_count": severity_counts["amber"],
+            "passing_count": severity_counts["green"]
+        },
+        "metrics": metrics_by_attr
+    }
+    
+    gemini = get_gemini_service()
+    report = gemini.generate_compliance_report(results, format)
+    
+    return {"report": report, "format": format}
+
+@app.get("/api/health/google")
+def google_services_health():
+    """Check Google AI services configuration status."""
+    gemini = get_gemini_service()
+    return {
+        "gemini": {
+            "configured": gemini.is_configured,
+            "model": gemini.model if gemini.is_configured else None
+        }
+    }
+
+@app.post("/api/auth/verify", response_model=schemas.AuthResponse)
+def verify_auth(request: schemas.AuthRequest):
+    """Verify Firebase ID token and return user info."""
+    firebase = get_firebase_service()
+    user = firebase.verify_token(request.id_token)
+    
+    if user:
+        return schemas.AuthResponse(
+            uid=user.get("uid", ""),
+            email=user.get("email", ""),
+            id_token=request.id_token,
+            source="firebase" if firebase.is_configured else "fallback"
+        )
+    raise HTTPException(status_code=401, detail="Invalid token")
+
+@app.get("/api/auth/user/{uid}")
+def get_user(uid: str):
+    """Get user info from Firebase."""
+    firebase = get_firebase_service()
+    user = firebase.get_user(uid)
+    
+    if user:
+        return user
+    raise HTTPException(status_code=404, detail="User not found")
+
+@app.post("/api/audit/{audit_run_id}/save")
+def save_audit_to_cloud(audit_run_id: int, user_id: str, db: Session = Depends(get_db)):
+    """Save audit to Firebase/Firestore."""
+    firebase = get_firebase_service()
+    
+    # Get audit data
+    audit_run = db.query(models.AuditRun).filter(models.AuditRun.id == audit_run_id).first()
+    if not audit_run:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    
+    metrics = db.query(models.MetricResult).filter(
+        models.MetricResult.audit_run_id == audit_run_id
+    ).all()
+    
+    audit_data = {
+        "id": str(audit_run_id),
+        "project_id": audit_run.project_id,
+        "status": audit_run.status,
+        "metrics": [
+            {"name": m.metric_name, "attribute": m.protected_attribute, "value": m.value, "severity": m.severity}
+            for m in metrics
+        ]
+    }
+    
+    success = firebase.save_audit_to_firebase(user_id, audit_data)
+    return {"saved": success, "source": "firebase" if firebase.is_configured else "local"}
+
+@app.get("/api/audits/{user_id}")
+def get_user_audits(user_id: str):
+    """Get user's audit history from Firebase."""
+    firebase = get_firebase_service()
+    audits = firebase.get_user_audits(user_id)
+    return {"audits": audits, "count": len(audits), "source": "firebase" if firebase.is_configured else "local"}
+
+@app.get("/api/health/firebase", response_model=schemas.FirebaseStatusResponse)
+def firebase_health():
+    """Check Firebase configuration status."""
+    firebase = get_firebase_service()
+    return schemas.FirebaseStatusResponse(
+        configured=firebase.is_configured,
+        project_id=firebase.project_id if firebase.is_configured else None
     )
 
 if __name__ == "__main__":

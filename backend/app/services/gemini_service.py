@@ -1,0 +1,400 @@
+import os
+import json
+import logging
+from typing import Dict, List, Any, Optional
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file explicitly
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+class GeminiService:
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
+        self.model = "gemini-2.0-flash"
+        self.is_configured = bool(self.api_key and self.api_key != "YOUR_GEMINI_API_KEY_HERE")
+        
+        if self.is_configured:
+            try:
+                from google import genai
+                self.client = genai.Client(api_key=self.api_key)
+                logger.info("[GeminiService] ✓ Connected to Gemini API")
+            except ImportError:
+                logger.warning("[GeminiService] ⚠️  google-genai not installed, using fallback")
+                self.client = None
+                self.is_configured = False
+        else:
+            logger.info("[GeminiService] ℹ️  No API key found, using smart fallback mode")
+            self.client = None
+    
+    def generate_fairness_insights(self, audit_results: Dict[str, Any]) -> str:
+        """Generate human-readable insights from fairness metrics."""
+        if not self.is_configured or not self.client:
+            logger.info("[GeminiService] Using fallback insights generation")
+            return self._generate_fallback_insights(audit_results)
+        
+        try:
+            prompt = self._build_insight_prompt(audit_results)
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt
+            )
+            logger.info("[GeminiService] Generated AI insights successfully")
+            return response.text
+        except Exception as e:
+            logger.warning(f"[GeminiService] API call failed: {e}, using fallback")
+            return self._generate_fallback_insights(audit_results)
+    
+    def _generate_fallback_insights(self, results: Dict[str, Any]) -> str:
+        """Generate insights without AI - always works."""
+        summary = results.get("summary", {})
+        metrics = results.get("metrics", {})
+        
+        score = summary.get("overall_fairness_score", 0)
+        critical = summary.get("critical_violations", 0)
+        warnings = summary.get("warning_count", 0)
+        passing = summary.get("passing_count", 0)
+        
+        # Determine status
+        if critical > 0:
+            status = "🚨 CRITICAL ACTION NEEDED"
+        elif warnings > 0:
+            status = "⚠️  WARNINGS DETECTED"
+        else:
+            status = "✅ FAIRNESS CHECKS PASSED"
+        
+        # Build insights
+        lines = [
+            f"## 📊 Fairness Audit Summary",
+            f"",
+            f"**Overall Fairness Score:** {score:.0%}",
+            f"",
+            f"### {status}",
+            f"",
+            f"- **Critical Violations:** {critical}",
+            f"- **Warnings:** {warnings}", 
+            f"- **Passing Checks:** {passing}",
+            f"",
+            f"### Key Findings by Protected Attribute",
+            f""
+        ]
+        
+        for attr, attr_metrics in metrics.items():
+            lines.append(f"#### {attr.upper()}")
+            
+            # Find most severe issue for this attribute
+            severities = []
+            for metric_name, data in attr_metrics.items():
+                sev = data.get("severity", "unknown")
+                value = data.get("value", "N/A")
+                if isinstance(value, float):
+                    value = f"{value:.3f}"
+                severities.append((metric_name, sev, value))
+            
+            # Sort by severity
+            severity_order = {"red": 0, "amber": 1, "green": 2, "unknown": 3}
+            severities.sort(key=lambda x: severity_order.get(x[1], 3))
+            
+            for metric_name, sev, value in severities:
+                emoji = {"red": "🚨", "amber": "⚠️", "green": "✅", "unknown": "❓"}.get(sev, "❓")
+                lines.append(f"- {emoji} **{metric_name.replace('_', ' ').title()}:** {value}")
+            
+            lines.append("")
+        
+        # Add recommendations
+        lines.extend([
+            f"### 📋 Recommendations",
+            f""
+        ])
+        
+        if critical > 0:
+            lines.append("1. 🔴 **Immediate Action Required:** Review all critical violations")
+            lines.append("2. 📊 **Analyze root causes** in your training data")
+            lines.append("3. ⚖️ **Consider rebalancing** or applying fairness constraints")
+        elif warnings > 0:
+            lines.append("1. ⚠️ **Monitor warning areas** over time")
+            lines.append("2. 📈 **Collect more data** for underrepresented groups")
+        else:
+            lines.append("1. ✅ **Continue monitoring** in production")
+            lines.append("2. 📊 **Track metrics** for drift detection")
+        
+        lines.append("")
+        lines.append("*Generated by FairLens AI Insights*")
+        
+        if not self.is_configured:
+            lines.append("")
+            lines.append("---")
+            lines.append("💡 **Tip:** Add your Gemini API key to get AI-powered insights!")
+        
+        return "\n".join(lines)
+    
+    def _build_insight_prompt(self, results: Dict) -> str:
+        summary = results.get("summary", {})
+        metrics = results.get("metrics", {})
+        
+        prompt = f"""You are an AI fairness auditor. Analyze these results and provide:
+1. A summary of key findings (2-3 sentences)
+2. Priority action items (numbered list)
+3. Risk assessment
+
+Use professional tone suitable for technical and business stakeholders.
+
+Results:
+- Overall Fairness Score: {summary.get('overall_fairness_score', 0):.2f}
+- Critical Violations: {summary.get('critical_violations', 0)}
+- Warnings: {summary.get('warning_count', 0)}
+- Passing: {summary.get('passing_count', 0)}
+
+Metrics Breakdown:
+"""
+        for attr, attr_metrics in metrics.items():
+            prompt += f"\n### {attr}:\n"
+            for metric_name, data in attr_metrics.items():
+                prompt += f"- {metric_name}: {data.get('value', 'N/A')} (severity: {data.get('severity', 'unknown')})\n"
+        
+        prompt += "\nProvide actionable insights in plain language. Use markdown."
+        return prompt
+    
+    def chat_whatif(self, question: str, dataset_schema: Dict, model_info: Dict) -> Dict[str, Any]:
+        """Handle natural language what-if questions."""
+        if not self.is_configured or not self.client:
+            logger.info("[GeminiService] Using fallback what-if response")
+            return self._fallback_whatif(question, dataset_schema, model_info)
+        
+        try:
+            prompt = f"""You are a fairness analyst. Answer this question about a dataset/model.
+
+Dataset columns: {list(dataset_schema.keys())}
+Model type: {model_info.get('type', 'unknown')}
+
+Question: {question}
+
+Provide:
+1. Your answer
+2. Suggested feature changes  
+3. Expected impact on fairness metrics
+"""
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt
+            )
+            logger.info("[GeminiService] Generated what-if response")
+            return {"answer": response.text}
+        except Exception as e:
+            logger.warning(f"[GeminiService] API call failed: {e}, using fallback")
+            return self._fallback_whatif(question, dataset_schema, model_info)
+    
+    def _fallback_whatif(self, question: str, dataset_schema: Dict, model_info: Dict) -> Dict[str, Any]:
+        """Generate fallback what-if response."""
+        q = question.lower()
+        
+        # Simple keyword-based responses
+        if "age" in q or "gender" in q or "race" in q:
+            answer = f"""Based on your question about protected attributes:
+
+**Analysis:**
+Removing or modifying protected attributes like age, gender, or race can help achieve fairness, but be careful not to introduce proxy discrimination through correlated features.
+
+**Recommendations:**
+1. Check for correlated features that could act as proxies
+2. Consider using fairness-aware training
+3. Test with and without the attribute to measure impact
+"""
+        elif "remove" in q or "drop" in q:
+            answer = """When removing features:
+1. Check for information leakage through other correlated features
+2. Test model performance on different demographic groups
+3. Consider using adversarial debiasing techniques
+
+Would you like me to run a comparative analysis?
+"""
+        else:
+            answer = f"""To answer your what-if question properly:
+
+1. Make the suggested change to your model/dataset
+2. Re-run the fairness audit
+3. Compare the new metrics with baseline
+
+Key metrics to track:
+- Demographic Parity Difference
+- Equal Opportunity Difference  
+- Disparate Impact Ratio
+
+Would you like to proceed with this analysis?
+"""
+        
+        return {"answer": answer}
+    
+    def generate_compliance_report(self, audit_results: Dict, format: str = "markdown") -> str:
+        """Generate compliance documentation."""
+        if not self.is_configured or not self.client:
+            return self._generate_fallback_compliance_report(audit_results, format)
+        
+        try:
+            prompt = f"""Generate a {format} compliance report for this fairness audit."""
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt
+            )
+            logger.info("[GeminiService] Generated compliance report")
+            return response.text
+        except Exception as e:
+            logger.warning(f"[GeminiService] API failed: {e}, using fallback")
+            return self._generate_fallback_compliance_report(audit_results, format)
+    
+    def _generate_fallback_compliance_report(self, results: Dict, format: str) -> str:
+        """Generate fallback compliance report."""
+        summary = results.get("summary", {})
+        
+        report = f"""# Fairness Compliance Report
+
+## Executive Summary
+
+This report documents the fairness audit conducted on {summary.get('audit_date', 'the dataset')}.
+
+**Overall Fairness Score:** {summary.get('overall_fairness_score', 0):.0%}
+
+### Critical Violations: {summary.get('critical_violations', 0)}
+### Warnings: {summary.get('warning_count', 0)}
+### Passing Checks: {summary.get('passing_count', 0)}
+
+---
+
+## Methodology
+
+The audit evaluated machine learning model fairness across the following metrics:
+
+1. **Demographic Parity Difference** - Measures difference in positive prediction rates across groups
+2. **Equal Opportunity Difference** - Measures difference in true positive rates across groups  
+3. **Disparate Impact Ratio** - Applies the 80% rule (ratio below 0.8 indicates potential bias)
+4. **Equalized Odds** - Combined true positive and false positive rate parity
+
+---
+
+## Findings
+
+"""
+        
+        metrics = results.get("metrics", {})
+        for attr, attr_metrics in metrics.items():
+            report += f"### {attr.upper()}\n\n"
+            for metric_name, data in attr_metrics.items():
+                severity = data.get("severity", "unknown")
+                value = data.get("value", "N/A")
+                if isinstance(value, float):
+                    value = f"{value:.4f}"
+                report += f"- **{metric_name.replace('_', ' ').title()}:** {value} ({severity.upper()})\n"
+            report += "\n"
+        
+        report += """---
+
+## Remediation Recommendations
+
+Based on the findings above, consider the following actions:
+
+1. **For Critical Violations:**
+   - Review and rebalance training data
+   - Apply fairness constraints during training
+   - Consider post-processing calibration
+
+2. **For Warnings:**
+   - Monitor metrics over time
+   - Collect more representative data
+   - Implement drift detection
+
+3. **General Best Practices:**
+   - Regular fairness audits (monthly recommended)
+   - Document all model changes
+   - Maintain audit trail for compliance
+
+---
+
+## Compliance Notes
+
+This report may be used for compliance with:
+- GDPR Article 22 (Automated Decision-Making)
+- EEOC guidelines on algorithmic fairness
+- Industry-specific fairness regulations
+
+---
+
+*Generated by FairLens - Fairness Auditing Platform*
+"""
+        
+        if not self.is_configured:
+            report += "\n\n---\n💡 *Add your Gemini API key to enable AI-powered report generation!*"
+        
+        return report
+    
+    def auto_detect_sensitive_columns(self, df_schema: Dict[str, str]) -> List[Dict[str, Any]]:
+        """Use Gemini to intelligently detect sensitive columns."""
+        if not self.is_configured or not self.client:
+            return self._fallback_detect_sensitive(df_schema)
+        
+        try:
+            prompt = f"""Analyze this dataset schema and identify potentially sensitive/protected attributes.
+
+Schema (column name -> type):
+{json.dumps(df_schema, indent=2)}
+
+For each sensitive column identified, provide:
+1. Column name
+2. Sensitivity reason
+3. Confidence level (high/medium/low)
+
+Return as JSON array with format: [{{"column": "name", "reason": "...", "confidence": "high"}}]
+"""
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt
+            )
+            return json.loads(response.text)
+        except Exception as e:
+            logger.warning(f"[GeminiService] API failed: {e}, using fallback")
+            return self._fallback_detect_sensitive(df_schema)
+    
+    def _fallback_detect_sensitive(self, schema: Dict[str, str]) -> List[Dict[str, Any]]:
+        """Fallback sensitive column detection."""
+        SENSITIVE_PATTERNS = {
+            'gender': {'confidence': 'high', 'reason': 'Directly identifies protected group'},
+            'sex': {'confidence': 'high', 'reason': 'Directly identifies protected group'},
+            'race': {'confidence': 'high', 'reason': 'Protected attribute under EEOC'},
+            'ethnicity': {'confidence': 'high', 'reason': 'Protected attribute'},
+            'religion': {'confidence': 'high', 'reason': 'Protected attribute'},
+            'age': {'confidence': 'high', 'reason': 'Protected attribute (age discrimination)'},
+            'disability': {'confidence': 'high', 'reason': 'Protected attribute under ADA'},
+            'veteran': {'confidence': 'high', 'reason': 'Protected status'},
+            'caste': {'confidence': 'high', 'reason': 'Protected attribute'},
+            'nationality': {'confidence': 'high', 'reason': 'Protected attribute'},
+            'sexual_orientation': {'confidence': 'high', 'reason': 'Protected attribute'},
+            'marital_status': {'confidence': 'medium', 'reason': 'May indicate protected group'},
+        }
+        
+        detected = []
+        schema_lower = {k.lower(): v for k, v in schema.items()}
+        
+        for col, col_type in schema_lower.items():
+            for pattern, info in SENSITIVE_PATTERNS.items():
+                if pattern in col:
+                    # Find original column name
+                    original = next((k for k in schema.keys() if k.lower() == col), col)
+                    detected.append({
+                        "column": original,
+                        "reason": info['reason'],
+                        "confidence": info['confidence']
+                    })
+                    break
+        
+        return detected
+
+
+# Singleton instance - initialized lazily
+_gemini_service: Optional[GeminiService] = None
+
+def get_gemini_service() -> GeminiService:
+    global _gemini_service
+    if _gemini_service is None:
+        _gemini_service = GeminiService()
+    return _gemini_service

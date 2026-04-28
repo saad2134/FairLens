@@ -1,0 +1,64 @@
+{
+  "functions": [
+    {
+      "name": "uploadDataset",
+      "runtime": "python311",
+      "source": "functions",
+      "entryPoint": "upload_dataset",
+      "trigger": {
+        "triggerType": "http",
+        "entryPoint": "upload_dataset"
+      },
+      "availableMemoryMb": 512,
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "runAudit",
+      "runtime": "python311",
+      "source": "functions",
+      "entryPoint": "run_audit",
+      "trigger": {
+        "triggerType": "http",
+        "entryPoint": "run_audit"
+      },
+      "availableMemoryMb": 1024,
+      "timeoutSeconds": 120
+    },
+    {
+      "name": "generateInsights",
+      "runtime": "python311",
+      "source": "functions",
+      "entryPoint": "generate_insights",
+      "trigger": {
+        "triggerType": "http",
+        "entryPoint": "generate_insights"
+      },
+      "availableMemoryMb": 512,
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "whatIfChat",
+      "runtime": "python311",
+      "source": "functions",
+      "entryPoint": "what_if_chat",
+      "trigger": {
+        "triggerType": "http",
+        "entryPoint": "what_if_chat"
+      },
+      "availableMemoryMb": 512,
+      "timeoutSeconds": 30
+    },
+    {
+      "name": "generateReport",
+      "runtime": "python311",
+      "source": "functions",
+      "entryPoint": "generate_report",
+      "trigger": {
+        "triggerType": "http",
+        "entryPoint": "generate_report"
+      },
+      "availableMemoryMb": 512,
+      "timeoutSeconds": 60
+    }
+  ]
+}

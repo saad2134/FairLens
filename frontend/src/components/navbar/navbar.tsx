@@ -27,7 +27,7 @@ interface NavbarProps {
 
 const navItems = [
   { name: "Features", link: "/#features" },
-  { name: "Pricing", link: "/pricing" },
+  { name: "Pricing", link: "/#pricing" },
 ];
 
 export default function NavbarComponent({
@@ -55,8 +55,8 @@ export default function NavbarComponent({
 
   return (
     <div className="fixed inset-x-0 top-0 z-50 w-full">
-      <div className="mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start bg-background/90 backdrop-blur-md px-6 py-3 lg:flex border-b border-border">
-<Link href="/" className="flex items-center gap-2">
+      <div className="mx-auto hidden w-full max-w-full flex items-center justify-between bg-background/90 backdrop-blur-md px-6 py-3 lg:flex border-b border-border">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
             <Image 
               src="/favicon.svg" 
               alt="FairLens" 
@@ -67,7 +67,7 @@ export default function NavbarComponent({
             <span className="font-bold text-xl text-foreground">{siteConfig.name}</span>
           </Link>
 
-        <div className="hidden flex-row items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground lg:flex">
+        <div className="hidden absolute left-1/2 -translate-x-1/2 flex-row items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground lg:flex">
           {items.map((item, idx) => (
             <button
               key={`link-${idx}`}
@@ -79,7 +79,7 @@ export default function NavbarComponent({
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 shrink-0">
           <Link 
             href="/login" 
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -117,7 +117,7 @@ export default function NavbarComponent({
         </div>
       </div>
 
-      <div className="relative top-0 z-50 mx-auto flex w-full flex-col items-center justify-between bg-background/95 backdrop-blur-xl px-4 py-3 lg:hidden border-b border-border">
+      <div className="relative top-0 z-50 mx-auto flex w-full max-w-full flex-col items-center justify-between bg-background/95 backdrop-blur-xl px-4 py-3 lg:hidden border-b border-border">
         <div className="flex w-full flex-row items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Image 

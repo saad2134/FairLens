@@ -3,7 +3,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import Image from "next/image";
 import { Github } from "lucide-react";
 import { siteConfig, SOCIAL_LINKS } from "@/config/site";
 
@@ -106,7 +105,7 @@ export default function FooterSection({
             <FooterColumn className="lg:col-span-2">
               <div className="flex flex-col gap-4">
                 <Link href="/" className="flex items-center gap-2">
-                  <Image src="/favicon.svg" alt="Logo" width={24} height={24} className="text-primary" />
+                  <img src="/favicon.svg" alt="Logo" width={24} height={24} className="text-primary" />
                   <span className="font-bold text-lg text-foreground">{siteConfig.name}</span>
                 </Link>
                 <p className="text-muted-foreground text-sm max-w-md">

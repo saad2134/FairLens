@@ -169,3 +169,37 @@ class DashboardSummary(BaseModel):
     avg_fairness_score: float
     critical_violations: int
     recent_audits: List[AuditRunWithMetrics] = []
+
+# Google AI Schemas
+class WhatIfChatRequest(BaseModel):
+    question: str
+    dataset_schema: Dict[str, str]
+    model_info: Dict[str, Any]
+
+class InsightsResponse(BaseModel):
+    insights: str
+    source: str  # "gemini" or "fallback"
+
+class ComplianceReportRequest(BaseModel):
+    format: str = "markdown"
+
+class ComplianceReportResponse(BaseModel):
+    report: str
+    format: str
+
+class ChatResponse(BaseModel):
+    answer: str
+
+# Firebase Schemas
+class AuthRequest(BaseModel):
+    id_token: str
+
+class AuthResponse(BaseModel):
+    uid: str
+    email: str
+    id_token: str
+    source: str  # "firebase" or "fallback"
+
+class FirebaseStatusResponse(BaseModel):
+    configured: bool
+    project_id: Optional[str] = None

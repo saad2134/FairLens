@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import NavbarComponent from "@/components/navbar/navbar";
 import FooterSection from "@/components/footer/footer";
+import PricingSection from "@/components/pricing/pricing-card";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,7 +73,20 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <NavbarComponent />
       
-      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
+        </div>
+        <div className="absolute inset-0 -z-10" aria-hidden="true">
+          <div className="absolute top-20 left-10 w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="absolute top-40 right-20 w-3 h-3 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
+          <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDelay: '400ms' }} />
+          <div className="absolute bottom-20 right-1/3 w-2 h-2 bg-primary/30 rounded-full animate-bounce" style={{ animationDelay: '600ms' }} />
+          <div className="absolute top-1/3 left-1/3 w-1 h-1 bg-primary/50 rounded-full animate-ping" />
+          <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-primary/20 rounded-full animate-ping" style={{ animationDelay: '500ms' }} />
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
@@ -116,15 +130,18 @@ export default function HomePage() {
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className={`card ${feature.highlighted ? 'border-primary border-2' : ''}`}
+                className="relative bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
               >
+                {feature.highlighted && (
+                  <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary mt-3 mr-3" />
+                )}
                 <div className={`w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4`}>
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {feature.description}
                 </p>
               </div>
@@ -146,8 +163,8 @@ export default function HomePage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {metrics.map((metric, index) => (
-              <div key={index} className="card flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <div key={index} className="bg-card border border-border rounded-xl p-4 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mb-3">
                   <Check className="w-4 h-4 text-primary" />
                 </div>
                 <div>
@@ -160,6 +177,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <PricingSection />
+
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-primary/5">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-foreground mb-4">
@@ -168,13 +187,14 @@ export default function HomePage() {
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Start auditing your models today and build fairer AI systems
           </p>
-          <button 
+          <Button 
             onClick={handleGetStarted}
-            className="btn-primary text-lg px-8 py-3"
+            size="lg"
+            className="gap-2"
           >
             Get Started Free
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </button>
+            <ArrowRight className="w-5 h-5" />
+          </Button>
         </div>
       </section>
 

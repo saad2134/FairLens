@@ -1,16 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Output static HTML files
+  output: "export",
+  // Add trailing slashes for proper routing
+  trailingSlash: true,
+  // Disable image optimization for static export
   images: {
-    remotePatterns: [],
-  },
-  async rewrites() {
-    return [
+    unoptimized: true,
+    remotePatterns: [
       {
-        source: "/api/:path*",
-        destination: "http://localhost:8000/api/:path*",
+        protocol: "https",
+        hostname: "**",
       },
-    ];
+    ],
   },
 };
 
