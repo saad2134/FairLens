@@ -62,3 +62,4 @@ htmlcov/
 /frontend/.next
 .env
 /frontend/out
+.firebase/
