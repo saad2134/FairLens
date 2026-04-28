@@ -1,33 +1,17 @@
-# FairLens ⚖️
+<h1 align="center">⚖️ FairLens – Enterprise-grade AI fairness auditing platform</h1>
 
-<p align="center">
-  <a href="https://pypi.org/project/fairlens/">
-    <img src="https://img.shields.io/pypi/v/fairlens" alt="PyPI" />
-  </a>
-  <a href="https://hub.docker.com/r/fairlens/fairlens">
-    <img src="https://img.shields.io/docker/v/fairlens/fairlens?label=docker" alt="Docker" />
-  </a>
-  <a href="https://pypi.org/project/fairlens/">
-    <img src="https://img.shields.io/pypi/pyversions/fairlens" alt="Python" />
-  </a>
-  <a href="https://github.com/fairlens/fairlens/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/fairlens/fairlens" alt="License" />
-  </a>
-</p>
+> <p align="center">🚨 <strong>"FairLens is a full-stack SaaS platform that enables teams to upload datasets and trained models, then receive comprehensive, interactive fairness audit reports. Built for production use with model-format agnosticism, audit versioning, and enterprise compliance features."</strong></p>
 
-<p align="center">
-  <strong>Enterprise-grade AI fairness auditing platform</strong>
-</p>
+<div align="center">
 
----
+<a href="https://shiksha-disha.vercel.app/" target="_blank">
+    <img  style="width:350px;" src="https://img.shields.io/badge/🚀_Access_the_Prototype_Here-Live-brightgreen?style=for-the-badge&labelColor=80FF80" alt="Access the Prototype Here"  />
+</a>
 
-## What is FairLens?
+![Phase](https://img.shields.io/badge/🛠️%20Phase-In%20Development-blue?style=for-the-badge)
+![Platforms](https://img.shields.io/badge/🌐%20Platforms-Web%20%7C%20Android*-28a745?style=for-the-badge)
 
-FairLens is a full-stack SaaS platform that enables teams to upload datasets and trained models, then receive comprehensive, interactive fairness audit reports. Built for production use with model-format agnosticism, audit versioning, and enterprise compliance features.
-
-<p align="center">
-  <img width="748" height="294" alt="image" src="https://github.com/user-attachments/assets/f17cf875-6202-43bf-b516-0c3aa1bdb085" />
-</p>
+</div>
 
 ## ✨ Key Features
 
