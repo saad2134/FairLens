@@ -1,11 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Output static HTML files
-  output: "export",
-  // Add trailing slashes for proper routing
+  // Output - use default (not export) for dynamic rendering
+  // Add trailing slashes
   trailingSlash: true,
-  // Disable image optimization for static export
+  // Images work better with default config
   images: {
     unoptimized: true,
     remotePatterns: [

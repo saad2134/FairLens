@@ -79,41 +79,25 @@ export default function NavbarComponent({
           ))}
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
+<div className="flex items-center gap-4 shrink-0">
           <Link 
             href="/login" 
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-medium text-muted-foreground/50 hover:text-muted-foreground/70 transition-colors cursor-not-allowed"
           >
             Sign In
           </Link>
           <Link 
             href="/signup" 
-            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="px-4 py-2 rounded-lg bg-primary/20 text-primary/50 font-medium hover:bg-primary/25 transition-colors cursor-not-allowed border border-primary/30"
           >
             Get Started
           </Link>
           <Link 
-            href="/dashboard" 
+            href="/demo/dashboard" 
             className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium hover:bg-primary/10 transition-all animate-pulse"
           >
             Try Demo
           </Link>
-          {showModeToggle && (
-            <DropdownMenu open={isThemeDropdownOpen} onOpenChange={setIsThemeDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="cursor-pointer border-border">
-                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-popover border-border">
-                <DropdownMenuItem onClick={() => { setTheme("light"); setIsThemeDropdownOpen(false); }}>Light</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setTheme("dark"); setIsThemeDropdownOpen(false); }}>Dark</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setTheme("system"); setIsThemeDropdownOpen(false); }}>System</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
         </div>
       </div>
 
@@ -147,19 +131,20 @@ export default function NavbarComponent({
             ))}
             <div className="flex flex-col gap-2 w-full mt-2">
               <Link
-                href="/login"
+                href="/demo/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-center px-4 py-2 rounded-lg border border-border text-sm font-medium"
+                className="text-center px-4 py-2 rounded-lg border border-primary text-primary text-sm font-medium"
               >
-                Sign In
+                Try Demo
               </Link>
-              <Link
-                href="/signup"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-center px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"
-              >
-                Get Started
-              </Link>
+              <div className="flex flex-col gap-2">
+                <div className="text-center px-4 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground/50 cursor-not-allowed">
+                  Sign In (Coming Soon)
+                </div>
+                <div className="text-center px-4 py-2 rounded-lg bg-primary/20 text-primary/50 text-sm font-medium cursor-not-allowed">
+                  Get Started (Coming Soon)
+                </div>
+              </div>
             </div>
           </div>
         )}

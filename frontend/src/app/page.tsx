@@ -100,17 +100,23 @@ export default function HomePage() {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               {siteConfig.description}
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button onClick={handleGetStarted} size="lg" className="gap-2">
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <Link href="#features">
-                <Button variant="outline" size="lg">
-                  Learn More
-                </Button>
-              </Link>
-            </div>
+<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+               <Link href="/demo/dashboard">
+                 <Button size="lg" className="gap-2">
+                   Get Started
+                   <ArrowRight className="w-5 h-5" />
+                 </Button>
+               </Link>
+               <Button variant="outline" size="lg" className="gap-2">
+                 Try Demo
+                 <ArrowRight className="w-5 h-5" />
+               </Button>
+               <Link href="#features">
+                 <Button variant="outline" size="lg" className="gap-2">
+                   Learn More
+                 </Button>
+               </Link>
+             </div>
           </div>
         </div>
       </section>
